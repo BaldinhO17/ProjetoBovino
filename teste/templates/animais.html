@@ -1,0 +1,225 @@
+{% extends 'janela.html' %}
+
+{% load static %}
+
+{% block breadcrumb %}
+Animais
+{% endblock %}
+
+{% block modal %}
+<div class="form-group">
+  <label for="codigo">Código:</label>
+  <span class="d-none">Por favor informe um código.</span>
+  <small class="text-danger font-weight-bold float-right pt-1 mr-2"></small>
+  <input type="text" class="form-control" id="codigo">
+</div>
+<div class="form-group">
+  <label for="nome">Nome:</label>
+  <span class="d-none">Por favor informe um nome.</span>
+  <small class="text-danger font-weight-bold float-right pt-1 mr-2"></small>
+  <input type="text" class="form-control" id="nome">
+</div>
+<div class="form-group">
+  <label for="sexo">Sexo:</label>
+  <span class="d-none">Por favor informe um sexo.</span>
+  <small class="text-danger font-weight-bold float-right pt-1 mr-2"></small>
+  <input type="text" class="form-control" id="sexo">
+</div>
+<div class="form-group">
+  <label for="peso">Peso:</label>
+  <span class="d-none">Por favor informe um peso.</span>
+  <small class="text-danger font-weight-bold float-right pt-1 mr-2"></small>
+  <input type="text" class="form-control" id="peso">
+</div>
+{% endblock %}
+
+{% block tabela %}
+<script>
+  let tabela = $('table').DataTable({
+    ajax: {
+      url: `{% url 'carregar_animais' %}`,
+      type: 'POST',
+      },
+    columns: [
+      { title: 'Código', className: 'all' },
+      { title: 'Nome', className: 'all' },
+      { title: 'Sexo', className: 'min-desktop' },
+      { title: 'Peso', className: 'min-desktop' },
+      { className: 'control', title: `<img src="{% static 'img/expandir.svg' %}">` }
+    ],
+    order: [[1, 'asc']],
+    buttons: [
+      {
+        text: `<img height='11px' src="{% static 'img/adicionar.svg' %}"><br>Adic.`,
+        className: 'btn-outline-success',
+        action: function () {
+          $('.modal-title').text('Adicionar Animal')
+          $('form input').removeClass('is-valid is-invalid').prev().removeClass('text-muted').empty()
+          $('#codigo').prop('disabled', false).val('')
+          $('#nome').val('')
+          $('#sexo').val('')
+          $('#peso').val('')
+          $('#salvar').addClass('disabled')
+          $('.modal').prop('acao', 'adicionar').modal('show')
+        }
+      },
+      {
+        text: `<img height='10px' src="{% static 'img/editar.svg' %}"><br>Editar`,
+        className: 'editar',
+        extend: 'selectedSingle',
+        action: function () {
+          $('.modal-title').text('Editar Animal')
+          $('form input').removeClass('is-valid is-invalid').prev().removeClass('text-muted').empty()
+          $('#codigo').prop('disabled', true).val(tabela.row({ selected: true }).data()[0])
+          $('#nome').val(tabela.row({ selected: true }).data()[1])
+          $('#sexo').val(tabela.row({ selected: true }).data()[2])
+          $('#peso').val(tabela.row({ selected: true }).data()[3])
+          $('#salvar').addClass('disabled')
+          $('.modal').prop('acao', 'editar').modal('show')
+        }
+      },
+      {
+        text: `<img height='13px' src="{% static 'img/apagar.svg' %}"><br>Apagar`,
+        className: 'apagar',
+        extend: 'selectedSingle',
+        action: function () { apagar() }
+      },
+      {
+        text: `<img height='13px' src="{% static 'img/info.svg' %}"><br>Info`,
+        className: 'info',
+        extend: 'selectedSingle',
+        action: function () { info()}
+      }
+    ]
+  })
+</script>
+{% endblock %}
+
+{% block validacao %}
+<script>
+  $('form input').on('input', function () {
+    $('#salvar').addClass('disabled')
+    input = $(this).removeClass('is-valid').addClass('is-invalid')
+    valor = input.val()
+    mensagem = input.prev().removeClass('text-muted')
+    switch (input.attr('id')) {
+      case 'codigo':
+        chave = tabela.column(0).data().toArray()
+        if (valor == '') {
+          mensagem.text('Por favor informe uma código.')
+        } else if (valor.match(/^[0-9]+$/) == null) {
+          mensagem.text('Somente números.')
+        } else if (chave.includes(valor)) {
+          mensagem.text('Esta código já existe.')
+        } else {
+          mensagem.empty()
+          input.removeClass('is-invalid').addClass('is-valid')
+        }; break
+      case 'nome':
+        if (valor == '') {
+          mensagem.text('Por favor informe um nome.')
+        } else if (valor.match(/^[a-záàâãéèêíïóôõöúçñ ]+$/i) == null) {
+          mensagem.text('Apenas letras.')
+        } else {
+          mensagem.empty()
+          input.removeClass('is-invalid').addClass('is-valid')
+        }; break
+      case 'sexo':
+        if (valor == '') {
+          mensagem.text('Por favor informe uma sexo.')
+        } else if (valor.match(/^[a-záàâãéèêíïóôõöúçñ ]+$/i) == null) {
+          mensagem.text('Apenas letras.')
+        } else if (valor != 'Masculino' && valor != 'Feminino') {
+          mensagem.text('Sexo inválido.')
+        } else {
+          mensagem.empty()
+          input.removeClass('is-invalid').addClass('is-valid')
+        }; break
+      case 'peso':
+        if (valor == '') {
+          mensagem.text('Por favor informe um peso.')
+        } else if (valor.match(/^[0-9.]+$/) == null) {
+          mensagem.text('Apenas números e .')
+        } else {
+          mensagem.empty()
+          input.removeClass('is-invalid').addClass('is-valid')
+        }
+    }
+    switch ($('.modal').prop('acao')) {
+      case 'adicionar':
+        $('form input').each(function () {
+          input = $(this)
+          valor = input.val()
+          mensagem = input.prev().text()
+          if (valor != '' && mensagem == '') {
+            input.removeClass('is-invalid').addClass('is-valid')
+          }
+        })
+        if ($('.is-valid').length == $('form input').length) {
+          $('#salvar').removeClass('disabled')
+        } break
+      case 'editar':
+        mensagens = false
+        $('form small').each(function () {
+          if ($(this).text() != '') {
+            mensagens = true
+          }
+        })
+        if ($('.is-invalid').length == 0 && !mensagens) {
+          $('#salvar').removeClass('disabled')
+        }
+    }
+  })
+</script>
+{% endblock %}
+
+{% block envio %}
+<script>
+  function adicionar() {
+    valores = {
+      'codigo': $('#codigo').val(),
+      'nome': $('#nome').val(),
+      'sexo': $('#sexo').val(),
+      'peso': $('#peso').val(),
+      'modelo': 'A'
+    }
+    $.post(`{% url 'adicionar' %}`, valores, function () {
+      tabela.ajax.reload(function () {}, false).columns.adjust()
+      $('#resultados').attr('max', tabela.rows().count())
+      $('.modal').modal('hide')
+    })
+  }
+  function editar() {
+    valores = {
+      'codigo': $('#codigo').val(),
+      'nome': $('#nome').val(),
+      'sexo': $('#sexo').val(),
+      'peso': $('#peso').val(),
+      'modelo': 'A'
+    }
+    $.post(`{% url 'adicionar' %}`, valores, function () {
+      tabela.ajax.reload(function () {}, false).columns.adjust()
+      $('#resultados').attr('max', tabela.rows().count())
+      $('.modal').modal('hide')
+    })
+  }
+  function apagar() {
+    valores = {
+      'codigo': tabela.row({ selected: true }).data()[0],
+      'modelo': 'A'
+    }
+    $.post(`{% url 'apagar' %}`, valores, function () {
+      tabela.ajax.reload(function () {}, false).columns.adjust()
+      $('#resultados').attr('max', tabela.rows().count())
+    })
+  }
+  function info() {
+    codigo = tabela.row({ selected: true }).data()[0]
+    $.post(`{% url 'info_animais' %}`, {codigo, codigo}, () => {
+    window.location.assign(`{% url 'carregar_info_animal' %}`)
+    });
+    
+  }
+  
+</script>
+{% endblock %}
