@@ -74,6 +74,15 @@ def gestacao(request):
         erro = 'É preciso o login para acessar esta página'
         return render(request, 'erro.html', {'erro': erro})
 
+def produc_leite(request):
+    global logado
+    if logado:
+        return render(request, 'produc_leite.html', {'hora':hora, 'nome':nome})
+    else:
+        erro = 'É preciso o login para acessar esta página'
+        return render(request, 'erro.html', {'erro': erro})
+
+
 def graficos(request):
     global logado
     if logado:
@@ -268,7 +277,29 @@ def carregar_gestacao(request):
         erro = 'É preciso o login para acessar esta página'
         return render(request, 'erro.html', {'erro': erro})
 
-# ------ Funções da página Gráficos ------
+# ------ Funções da página Produção de Leite ------
+
+def carregar_produc_leite(request):
+    global logado
+    if logado:
+        femeas = Animal.objects.filter(sexo = "Feminino")
+        dados = []
+        for femea in femeas:
+            aux = Produc_leite.objects.get(femea = femea, data = request.GET['data'])
+            dados.append(
+                [
+                    femea.codigo,
+                    femea.nome,
+                    aux.quantidade,
+                    request.GET['data'],
+                    ''
+                ]
+            )
+        resposta = {"data":dados}
+            return JsonResponse(resposta)
+    else:
+        erro = 'É preciso o login para acessar esta página'
+        return render(request, 'erro.html', {'erro': erro})
 
 def get_femeas(request):
     if logado:

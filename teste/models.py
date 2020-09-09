@@ -31,31 +31,31 @@ class Animal(models.Model):
           ('M','Masculino')
       ])
 
-class Macho(Animal):
-    inicRepr = models.DateField(blank = True, null = True)
-    fimRepr = models.DateField(blank = True, null = True)
+# class Macho(Animal):
+#     inicRepr = models.DateField(blank = True, null = True)
+#     fimRepr = models.DateField(blank = True, null = True)
     
-    def reproducao(self, data):
-        self.inicRepr = data
+#     def reproducao(self, data):
+#         self.inicRepr = data
     
-    def fim_reproducao(self, data):
-        self.fimRepr = data
+#     def fim_reproducao(self, data):
+#         self.fimRepr = data
    
-class Femea(Animal):
-    inicLact = models.DateField(blank = True, null = True)
-    fimLact = models.DateField(blank = True, null = True)
+# class Femea(Animal):
+#     inicLact = models.DateField(blank = True, null = True)
+#     fimLact = models.DateField(blank = True, null = True)
 
-    def lactacao(self, data):
-        self.inicLact = data
+#     def lactacao(self, data):
+#         self.inicLact = data
     
-    def fim_lactacao(self, data):
-        self.fimLact = data
+#     def fim_lactacao(self, data):
+#         self.fimLact = data
 
 class Produc_leite(models.Model):
     
     data = models.DateField()
     quantidade = models.DecimalField(max_digits=5 , decimal_places=2)
-    femea = models.ForeignKey(Femea, on_delete=models.CASCADE)
+    femea = models.ForeignKey(Animal, on_delete=models.CASCADE)
 
 class Saida_Leite(models.Model):
     
@@ -66,20 +66,20 @@ class Saida_Leite(models.Model):
 
 class Cobertura(models.Model):
     inicio = models.DateField(blank = True, null = True)
-    macho = models.ForeignKey(Macho, on_delete=models.DO_NOTHING)
-    femea = models.ForeignKey(Femea, on_delete=models.DO_NOTHING)
+    macho = models.ForeignKey(Animal, related_name='macho' , on_delete=models.DO_NOTHING)
+    femea = models.ForeignKey(Animal, related_name='femea' , on_delete=models.DO_NOTHING)
     inicio2 = models.DateField(blank = True, null = True)
 
 class Gravidez(models.Model):
     inicio = models.DateField(blank = True, null = True)
     fim = models.DateField(blank = True, null = True)
-    animal = models.ForeignKey(Femea, on_delete=models.CASCADE)
+    animal = models.ForeignKey(Animal, on_delete=models.CASCADE)
     inicio2 = models.DateField(blank = True, null = True)
 
 class Nascimento(models.Model):
     data = models.DateField()
-    pai = models.ForeignKey(Macho, related_name='pai' ,on_delete=models.DO_NOTHING)
-    matriz = models.ForeignKey(Femea, related_name='matriz' , on_delete=models.DO_NOTHING)
+    pai = models.ForeignKey(Animal, related_name='pai' ,on_delete=models.DO_NOTHING)
+    matriz = models.ForeignKey(Animal, related_name='matriz' , on_delete=models.DO_NOTHING)
     filhote = models.ForeignKey(Animal, on_delete=models.CASCADE)
     peso = models.DecimalField(max_digits=5 , decimal_places=2)
     obito = models.BooleanField()
@@ -115,7 +115,7 @@ class Aquisicao(models.Model):
 class Secacao(models.Model):
     
     data = models.DateField()
-    matriz = models.ForeignKey(Femea, on_delete=models.DO_NOTHING)
+    matriz = models.ForeignKey(Animal, on_delete=models.DO_NOTHING)
     leite = models.CharField(max_length=30, choices=[
         ('n','NÃO MAIS'),
         ('p','POUCO LEITE'),
