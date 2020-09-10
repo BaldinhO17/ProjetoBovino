@@ -23,7 +23,7 @@ Estoque
   <label for="validade">Validade:</label>
   <span class="d-none">Por favor informe uma validade.</span>
   <small class="text-danger font-weight-bold float-right pt-1 mr-2"></small>
-  <input type="text" class="form-control" id="validade">
+  <input type="date" class="form-control" id="validade">
 </div>
 <div class="form-group">
   <label for="quantidade">Quantidade:</label>
@@ -116,10 +116,6 @@ Estoque
       case 'validade':
         if (valor == '') {
           mensagem.text('Por favor informe uma validade.')
-        } else if (valor.match(/^[0-9/]+$/) == null) {
-          mensagem.text('(Dia)/(Mês)/(Ano) ex: 31/12/2020.')
-        } else if (valor.match(/[/]/) == null) {
-          mensagem.text('(Dia)/(Mês)/(Ano) ex: 31/12/2020.')
         } else {
           mensagem.empty()
           input.removeClass('is-invalid').addClass('is-valid')
@@ -165,16 +161,10 @@ Estoque
 {% block envio %}
 <script>
   function adicionar() {
-    var aux = $('#validade').val()
-    console.log(aux)
-    var aux2 = aux.split("/")
-    console.log("this is aux2:"+aux2)
-    var validade = aux2[2]+"-"+aux2[1]+"-"+aux2[0]
-    console.log(validade)
     valores = {
       'tipo': $('#tipo').val(),
       'nome': $('#nome').val(),
-      'validade': validade,
+      'validade': $('#validade').val(),
       'quantidade': $('#quantidade').val(),
       'modelo': 'M'
     }
@@ -200,7 +190,7 @@ Estoque
   }
   function apagar() {
     valores = {
-      'tipo': tabela.row({ selected: true }).data()[0],
+      'codigo': tabela.row({ selected: true }).data()[1],
       'modelo': 'M'
     }
     $.post(`{% url 'apagar' %}`, valores, () =>{

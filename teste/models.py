@@ -84,10 +84,10 @@ class Nascimento(models.Model):
     peso = models.DecimalField(max_digits=5 , decimal_places=2)
     obito = models.BooleanField()
 
-class Gasto(models.Model):
+# class Gasto(models.Model):
     
-    valor = models.DecimalField(max_digits=7 , decimal_places=5)
-    data = models.DateField()
+#     valor = models.DecimalField(max_digits=7 , decimal_places=5)
+#     data = models.DateField()
 
 class Material(models.Model):
     
@@ -96,21 +96,21 @@ class Material(models.Model):
         ('equip','Equipamento Veterinário'),
         ('limp','Material de Limpeza')
         ])
-    nome = models.CharField(max_length=30)
+    nome = models.CharField(max_length=30, primary_key=True)
     quantidade = models.IntegerField()
-    quant_un = models.DecimalField(max_digits=5 , decimal_places=2)
-    un_medida = models.CharField(max_length=3, choices=[
-        ('l','l'),
-        ('ml','ml'),
-        ('g','g'),
-        ('mg','mg')
-        ])
+    # quant_un = models.DecimalField(max_digits=5 , decimal_places=2)
+    # un_medida = models.CharField(max_length=3, choices=[
+    #     ('l','l'),
+    #     ('ml','ml'),
+    #     ('g','g'),
+    #     ('mg','mg')
+    #     ])
     validade = models.DateField()
 
-class Aquisicao(models.Model):
+# class Aquisicao(models.Model):
     
-    gasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
-    material = models.ForeignKey(Material, on_delete=models.CASCADE)
+#     gasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
+#     material = models.ForeignKey(Material, on_delete=models.CASCADE)
  
 class Secacao(models.Model):
     

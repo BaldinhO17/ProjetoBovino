@@ -1,5 +1,5 @@
+import datetime
 from django.utils import timezone
-from datetime import datetime
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -282,21 +282,27 @@ def carregar_gestacao(request):
 def carregar_produc_leite(request):
     global logado
     if logado:
-        femeas = Animal.objects.filter(sexo = "Feminino")
+        prods = Produc_leite.objects.all()
         dados = []
-        for femea in femeas:
-            aux = Produc_leite.objects.get(femea = femea, data = request.GET['data'])
+        for prod in prods:
+            print(prod.femea.codigo)
+            femea = Animal.objects.get(codigo=prod.femea.codigo)
+            today = datetime.date.today()
+            yesterday = today - datetime.timedelta(days=6)
+            print(today)
+            print(yesterday)
+
             dados.append(
                 [
-                    femea.codigo,
+                    prod.id,
                     femea.nome,
-                    aux.quantidade,
-                    request.GET['data'],
+                    prod.quantidade,
+                    prod.data,
                     ''
                 ]
             )
         resposta = {"data":dados}
-            return JsonResponse(resposta)
+        return JsonResponse(resposta)
     else:
         erro = 'É preciso o login para acessar esta página'
         return render(request, 'erro.html', {'erro': erro})

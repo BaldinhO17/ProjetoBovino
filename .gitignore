@@ -2,3 +2,4 @@ myvenv/
 scripts basicos linha de comando.txt
 Funcoes a implementar.txt
 .vscode/
+*.pyc

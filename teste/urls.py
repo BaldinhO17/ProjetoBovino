@@ -18,9 +18,9 @@ urlpatterns = [
     path('gestacao/carregar/', views.carregar_gestacao, name='carregar_gestacao'),
     path('prod-leite/', views.produc_leite, name='produc_leite'),
     path('prod-leite/carregar/', views.carregar_produc_leite, name='carregar_produc_leite'),
-    path('graficos/', views.graficos, name='graficos'),
-    path('graficos/get-femeas', views.get_femeas, name='get_femeas'),
-    path('graficos/produc-leite/', views.dados_produc_leite, name='dados_produc_leite')
+    path('prod-leite/graficos/', views.graficos, name='graficos'),
+    path('prod-leite/graficos/get-femeas', views.get_femeas, name='get_femeas'),
+    path('prod-leite/graficos/produc-leite/', views.dados_produc_leite, name='dados_produc_leite')
     
 
     
